@@ -1,0 +1,580 @@
+18.2                                        COPYING
+
+
+
+            in our simple vector class 
+                the problem was that if we assign any vector to other ,it do not perform deep copy
+                it just be a another pointer to the same memory locations
+                e.g  vector v(3)
+                     vector v2 = v
+
+                     v and v2 points to same memory location
+                     v.sz == v2.sz   is true
+                     v.elem  == v2.elem  is also true
+
+                    this may cause problems like double delete;
+                     
+                    when the variables ( v and v2) goes out of scope then that memory will be freed twice which
+                    is disastrous due to calling of destructor for each varible.
+
+
+        
+
+
+
+        18.2.1                                      copy constructors
+
+
+
+                    initialization of objects of a class is done by a constructor.So ,we need a constructor that
+                    copies .Such constructor is obviously called a copy constructor. it is defined to take as its
+                    argument a const reference to the object from which to copy.
+
+
+                        vector( cosnt vector& );
+
+                    we need to define a private member function that will copy the whole elements from the given
+                    vector to new vector
+
+
+
+
+
+                    class vector{
+                        int sz;
+                        double* elem;
+                        void copy(const vector& arg);
+
+                    public:
+                        vector(int n);
+                        ~vector(){
+                            delete[] elem;
+                        }
+                        vector(const vector& );
+                    }
+
+
+                    void vector::copy(const vector& arg){
+                        for(int i=0;i<arg.sz;++i)elem[i] = arg.elem[i];
+                    }
+
+                    vector::vector(const vector& arg):sz(arg.sz),elem(new double[arg.sz]){
+                        copy(arg);
+                    }
+
+
+
+
+                    now
+                        vector v2 = v 
+                        vector v2(v)
+
+                        both the statements are equal.
+                        v is initializer
+                        v2  the varibale being initialized
+
+
+
+
+
+        18.2.2                                      Copy Assignment
+
+
+
+
+                Need???????????
+                        if we have two vectors (v1 and v2) both has been initialized and now what we want that v1 = v2
+
+                        previously what we have done with copy constructor that we made a new vector with a given one
+                        
+                        now the problem is differnt.
+                        we are now having to vectors initialized to differnt values and now we want they equal.
+
+                        so copy assignment is needed.
+
+
+                void f(){
+                    vector v(3);
+                    v.set(2,2.2);
+                    vector v2(4);
+                    v2 = v;             // assignment !!!!!!!!  problem
+
+                }
+                in the above assigment v2 simple points to the memory location of v with v2.sz = v.sz
+
+                we want a separate copy of v and v2 should point to that separate copy.
+
+
+
+                                    class vector{
+                                            private:
+                                                int sz;
+                                                double* elem;
+                                                void copy(const vector& arg){
+                                                    for(int i=0;i<arg.sz;++i)elem[i] = arg.elem[i];
+                                                }
+                                                void copy2(const vector& arg,double* p){
+                                                    for(int i=0;i<arg.sz;++i)p[i] = arg.elem[i];
+                                                }
+                                            public:
+                                                explicit vector(int n):sz(n),elem(new double[n]){}
+                                                int size()const{return sz;}
+                                                double get(int ind){return elem[ind];}
+                                                void set(int ind,double val){elem[ind]=val;}
+                                                double& operator[](int n){return elem[n];}
+                                                vector(const vector& arg):sz(arg.sz),elem(new double[arg.sz]){
+                                                    copy(arg);
+                                                }
+                                                void print(){
+                                                    for(int i=0;i<sz;++i)cout<<elem[i]<<" ";
+                                                    cout<<endl;
+                                                }
+
+                                                vector& operator=(const vector& a){
+                                                    double* p  = new double[a.sz];
+                                                    copy2(a,p);
+                                                    delete[] elem;
+                                                    elem = p;
+                                                    sz = a.sz;
+                                                    return *this;
+                                                }
+                                        };
+
+
+                                e.g.
+
+                                                vector v(2);
+                                                v.set(1,5);
+                                                v.print();
+                                                vector v1(4);
+                                                v1.set(2,6.2);
+                                                v1.print();
+                                                v = v1;
+                                                v1.print();
+
+
+            
+
+
+
+
+
+            18.2.3                              copy terminology
+
+
+
+
+
+                        Shallow copy cpoies only a pointer so that the two pointers now refer to the same object
+                        That's what pointers and references do.
+
+                        Deep copy copies a pointer points to so that the two pointers now refer to distinct objects.
+                        That's what vector and string etc.do. We define copy constructors and copy assignments when we
+                        want deep copy for objects or our classes.
+
+
+
+                        shallow copy e.g
+                                 int* p = new int(77);
+                                 int* q = p;         // copy the pointer
+                                 *p = 88;           // change the value of int pointed by p and q
+
+
+                        deep copy e.g
+                                int* p = new int(77);
+                                int*q = new int(*p); // allocate a new int, then copy the value pointed to by p
+                                *p =88              // change the value of int pointed to by p
+
+
+
+
+
+
+
+                        pointer or refernece semantics      ------- they copy address
+                        value semantics             -------- they copy the values pointed to
+
+
+
+                        value semantics is that they "work just like integers" as far as coping is concerned
+
+
+
+
+
+
+
+18.3                                        Essential operations
+
+                1.  Constructor from one or more arguments
+                2.  Default constructor    // i think it takes no arguments
+                3.  Copy constructor
+                4.  Copy assignment
+                5.  Destructor
+
+
+                we need a default constructor if we want to be able to make objects of class without specifying
+                an initializer. and the elements can be initialized with deault values like
+                int 0               int()
+                double 0.0          double()
+                string ""           string()
+                empty vector<int>   vector<int>()
+
+
+
+
+                we need a destructor if it acquires resources(memory,file,locks,thead handles,sockets)
+                we need to give back all the resources after use.
+
+                if a class has a pointer or a reference member ,it ofter needs a destructor and copy operations
+
+                A class that needs a destructor almost always also needs a copy constructor and a copy assignment
+
+
+                A base class for which a drived class may have a destructor need a virtual destructor.
+
+
+
+
+        18.3.1                                  Explicit constructor
+
+                   A constructor that takes a single argument defines a conversion from its argument type to its class.
+
+                   class vector{
+                        //....
+                        vector(int);
+                        //....
+                    };
+
+
+                    vector v = 10           // makes a vector of 10 doubles
+                    v = 20                  //Assigns a new vector of 20 doubles to v
+
+                    void f(const vector& );
+                    f(10)                   // calls f with new vector of 10 doubles
+
+                
+
+                    To supress this type of implicit conversion we use explicit keyword before single argument constructor
+
+                    class vector{
+                            explicit vector(int);
+
+
+
+                    }
+
+                    this will prevent implicit assignments
+
+
+
+        18.3.2                                  Debugging constructors and destructors
+
+
+
+
+                    we can write appropirate message in constructors , destructor, copy constructor,copy assignments
+                    so that we can know how the things happens
+
+                    we must see that no of constructors called must be equal to no of destructor calls.
+
+
+                    A destructor is called when --------------
+                        1. names go out of scope
+                        2. programme terminates
+                        3. delete is used on a pointer to an object
+
+
+                    A construcor(some appropirate constructor) is called when ----------
+                        1. Object of it's class is created
+                        2. a object is crated using new keyword
+                        3. object is copied
+
+                                #include<iostream>
+                                using namespace std;
+
+
+                                class X{
+                                    private:
+                                        int val;
+                                    public:
+                                        void out(const string& s){
+                                            cerr<<this<<"->"<<s<<": "<<val<<"\n";
+                                        }
+                                        X(){
+                                            val = 0;
+                                            out("X()");
+                                        }
+                                        X(int v):val(v){
+                                            out("X(int)");
+                                        }
+                                        X(const X& x):val(x.val){
+                                            out("X(X&)");
+                                        }
+                                        X& operator= (const X& a){
+                                            val = a.val;
+                                            out("X::opeartor=()");
+                                            return *this;
+                                        }
+                                        ~X(){
+                                            out("~X()");
+                                        }
+                                };
+                                int main(){
+
+                                    X a(10);
+                                    X b = 20;
+                                    X* c = new X(23);
+                                    a = *c;
+                                    X d(a);
+                                    delete c; // in case of pointer we need to explicitly call the delete to call destructor
+                                }
+
+
+
+
+                        to see memory leak not happening
+                        
+                        not of construcor call - no of destructor call = 0
+
+
+
+18.4                                        Acess to vector elements
+
+
+
+                        get() and set() look ugly
+
+
+                        need to use [] operator
+
+                        double operator[](int n){return elem[n];}
+
+                                this version can only be used to read not write
+
+                        double* operator[](int n){ return &elem[n];}
+
+                                this version can be used for both read and write but it is tidious
+                                we need to use * for every operation (like *v[i])
+
+                        double& operator[](int n){ return elem[n];}
+                                
+                                this is the best option 
+
+
+                            
+        18.4.1                              overloading on const
+
+
+
+
+                        the opeartor[] defined so far can't be invoked with const vector
+                        it will give error
+
+                        so we need to provide another overloaded function for operator[]
+
+                        double& operator[](int n)const;   // for const vectors
+
+
+                        vectors are often passed with const reference so this const version is important
+
+
+
+
+
+18.5                                            Arrays
+
+
+
+
+                       an array is a homogeneous sequence of objects allocated in contiguous memory
+                       that is all elements of an array have the same type and there are no gaps between the 
+                       objects of the sequence.
+
+                       Limitation::
+                                the number of elements of a named array must be known at compile time.
+                                if you want the number of elements to be a varible, you must put it on
+                                the free store and access it through a pointer.that's what vector does with it's
+                                array of elements
+
+
+
+                                there is no range checking
+                                Array does not range check
+
+
+        18.5.1                                          pointers to array elements
+
+
+
+
+                    double ad[10];
+                    double* p = &ad[5];
+                    *p = 7;
+                    p[2] = 6;
+                    p[-3] = 9;
+                    P+=2;       // pointer arithmetic
+                    p-=5;
+
+                
+                    we can subscript the pointer with both positive and negative numbers. as long as resulting
+                    elements is in range , all is well.
+                    
+
+
+                    p+=2   // moves p 2 elememts right
+
+                    most common pointer arithmetic is ++ and --
+
+
+
+
+        18.5.2                                      pointers and arrays
+
+
+
+                                double* p1 = &ad[0];
+                                double* p2 = p1+7;
+                                double* p3 = &ad[7];
+                                if(p2 != p3) cout<<"impossible";
+
+
+                                argument declaration to function like char p[] is considered equivalent to char* p
+                                and call to strlen(lots) is considered equivalent to strlen(&lots[0])
+
+                                    this saves from an expensive copy.
+
+                                        But in every other case,when you pass an object and don't explicitly 
+                                        declear an argument to be passed by reference that object is copied.
+
+
+
+
+                                Note that the pointer you get from treating the name of an  aray as a pointer
+                                to it's elements is a value and not a variable, so you can't assign to it;
+
+
+                                        char ac[10];
+                                        ac = new char[20]  // error : no assignment to array name
+                                        &ac[0] = new char[20] // error : no assignment to pointer value
+
+
+                        As a consequence of this array-name-to-pointer conversion, you can't even copy array using assignment.
+
+                        int x[100];
+                        int y[100];
+                        x=y;        //error
+                        int z[100] = y      //error
+
+
+
+    18.5.3                                          Array initialization
+
+                
+
+                        char* pd = "rohit"    // pd points to an array of 6 chars with terminating zero at the end
+                       you need n+1 chars to store n chars in c-style string 
+
+
+                        int a[] = {1,2,3,4,5} // array of 5 int
+                        int aa[100]={0,1,23};  // rest are initialized to 0
+                        double ad[100] = {}    // all initialized to 0.0
+                        char chars[] = {'a','b','c'}; // no terminating 0
+
+                        add a 0 at he end rule is for literals character string only.
+
+
+
+
+
+    18.5.4                                      pointer problems
+
+
+
+                            1. Acess through a null pointer
+                            2. Acess through an uninitialized pointer
+                            3. Access off the end of an array
+                            4. Access to a deallocated object
+                            5. Access to an object that goes out of scope
+
+
+                            1.
+                                    
+                                int* p= 0;
+                                *p = 7;     //segmentation fault
+
+                                always check if a pointer is null 
+                                    a. while passing a pointer as an argument to function 
+                                        check inside function
+                                    b. while assigning any output from a function to any pointer
+                                        that the return value is null or not
+
+                                using reference and exceptions to signal error are main tool for avoiding null pointers
+
+
+                            2.  do initialize your pointers
+
+                                int* p;
+                                *p = 9; // p is uninitialized pointer
+
+                                when a pointer gets an mem adderss then the pointer is suppose to be initialized
+
+                                
+                                don't forget to initialize pointers that are class members
+
+
+                            3. don't access nonexistent array elements
+
+                                int a[10];
+                                int* p = &a[10];
+                                *p=11;              //ouch!!!!
+                                a[10]= 12           // ouch!!!!
+
+
+                            4 . Don't access through a deleted pointer
+
+
+                                int* p = new int(7);
+                                //  ...
+                                delete p;
+                                // ...
+                                *p = 13;        // ouch !!!!
+
+
+                                avoid using naked new and delete
+
+                            5 . Don't return a pointer to a local varible
+
+
+                                local variable are stored in stack 
+                                so when function call returns 
+                                all the variable are lost and if we returned any pointer to local
+                                variable then it will be lost
+                                memory allocated to free store remains but stack memory lost
+
+                                int* f(){
+                                    int x = 7;
+                                    return &x;
+                                }
+                                int* p = f();
+                                *p = 15   //    ouch !!!!!
+
+
+                                                        vector& ff(){
+                                                            vector x(7);
+                                                            return x;
+                                                        }
+                                                        vector& p = ff();
+                                                        p[4] = 15 ;         //ouch !!!!!!!!11
+
+
+
+
+                
+                                    
+                                    
+
+
+
+
+

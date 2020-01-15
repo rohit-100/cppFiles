@@ -1,0 +1,26 @@
+1.      how delete[] works
+        delete[] a_pointer 
+        how delete[] knows the size of elements a_pointer points
+        
+
+
+
+        Ans--------------------------------------------
+                    When you allocate memory on the heap, your allocator will keep track of how much memory you have allocated. 
+                    This is usually stored in a "head" segment just before the memory that you get allocated. 
+                    That way when it's time to free the memory, the de-allocator knows exactly how much memory to free
+
+                    new[] also stores the number of elements it created in the memory block (independently of malloc),
+                    so that later delete[] can retrieve and use that number to call the proper number of destructors.
+
+
+
+2.      in copy assignment we initialize a new array of doubles like        double* p = new double[size]
+        then we call copy(a)
+        how this will copy the values of a into p 
+        because copy is meant for coping the value of a to elem array
+
+
+
+
+3.     how to access vector elements through a vector<int> pointer( suppose returned by a function ) ?????

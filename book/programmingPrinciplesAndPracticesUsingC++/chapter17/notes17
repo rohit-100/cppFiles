@@ -1,0 +1,395 @@
+1  
+    we can get the size of any builtin types using sizeof operator but in case of any user defined types it may not give proper value
+    vector<int> v(5000);
+    cout<<sizeof(v)<<endl;
+    This will print 24(as i tested) but what it should print like 5000*4
+    so sizeof is not counting the elements;
+
+
+
+2
+    The major problem with pointers is that a pointer doesn't know how many elements it points to.
+    compiler doesn't know how many memory has be allocated to a pointer;
+
+    double* pd = new double[3];
+    pd[2] = 3.2;
+    pd[4] = 4.4;
+    pd[-3]=-3.3;
+                    This all lines of code will get compile.
+
+
+    [] ---> this operator has only one work it only calculate the address based upon the type of object the pointer points and gets
+            the sizeof of that object and gets the resultant address where to point 
+
+
+    One more problem
+    read the code
+
+        double* p = new double;         //allocates a double
+        double* q = new double[1000];   //allocates 1000 double
+
+        q[700] = 7.7;       // fine
+        q = p;              // let q point to the same as p
+        double d  = q[700]  // out of range access   "DISASTER" 
+
+    this above code will compile without errors but will cause my programme crash and wrong behavior of systems
+
+
+    Solution -----------------
+        we need to introduce smart pointers so that it can track of the size of memeory it points and can throw out_of_range
+        error if any out_of_range access is made;
+        vector is almost a smart pointer
+       
+
+
+
+
+                                                    INTIALIZATION
+        an object has been given a value before we use it. i.e we want to be sure that out pointers are initialized and also
+        that the objects they point to have been initialized.
+
+        double* p0 ;                        // uninitialized: likely trouble    cout<<p0 will print 0
+        double* p1 = new double;            // get(allocated) an uninitialized double   cout<<p1 will print some address
+        double* p2 = new double(5.5);       // get a double initialized to 5.5
+        double* p3 = new double[5];         // get allocated 5 uninitialized doubles
+        
+        *p0 = 7.5                           // segmentation fault
+
+
+        Memory allocated by new is not intialized for built-in types;
+
+        we should worry about uninitialized objects and make sure we give them a value before we read them.
+        
+        if type X has default constructor we get:
+            X* px1 = new X;         //one default-initialized X
+            X* px2 = new X[17]      //17 default-initialized Xs
+
+        if type Y has a constructor ,by not default constructor,we have to explicitly initialize
+            Y* py1 = new Y;         //error : no default constructor
+            Y* py2 = new Y[17];     //error: not defalt constructor
+            Y* py3 = new Y(13);     //ok: initialized to Y(13)
+
+
+
+
+17.4.5           The null pointer
+
+                we need to use null pointer when we have a pointer that sometimes points to an object and sometimes not.
+                or
+                if you have no other pointer to use for initializing a pointer,use 0(zero)
+
+                    double* p0 = 0;
+
+                if(p0 != 0)   //consider valid
+                if(p0)       // consider valid
+
+
+                this is not the perfect test beacause p0 may contain a "random" value that happens to be nonzero or the address
+                of an object that has been deleted.
+
+
+
+17.4.6          
+                Free-store deallocation
+
+                There are two forms of delete
+                1. delete p       frees the mem for an single object allocated by new
+                2. delete[] p     frees the mem for an array of objects allocated by new
+
+                a sample programme for memory deallocation
+
+                                    double* calc(int res_size,int max){
+                                        double* p = new double[max];
+                                        double*  res = new double[res_size];
+                                        //use p to calculate res
+                                        delete[] p;
+                                        return res;
+                                    }
+                                    double* r = calc(233,34455);
+                                    //use r
+                                    delete[] r;
+
+
+                Deleting a object twice is bad mistak
+                int *p  = new int(3);
+                delete p;
+                //....
+                delete p;
+                         Possible problems:-------------
+                        1. you don't own the object pointed to anymore so the free-store manager may have changed it's internal data
+                            structure in such a way it can't correnctly execute delete p again
+                        2. The free-store manager may have recycled the memory pointed to by p
+                            fo that p now points to another object, deleting that other object(owned by some other part of programme)
+                            will cause errors in your program.
+                        
+
+                        both problems occcur in real prograame .they are not just theory
+
+                Deleting null pointer does not do aything
+
+                        int* p = 0;
+                        delete p;
+                        delete p;
+
+
+
+
+17.5
+
+                                                DESTRUCTOR
+
+                In the same way that a constructor is implicitly called when an object of a class is created, a destructor is implicitly
+                called when an object goes out of scope. A constructor makes sure that an object is properly created and initialized.
+                conversly a destructor makes sure that an object is properly cleaned up before it is destroyed.
+
+                Every class that "owns" a resource needs a destructor.
+                
+                class vector{
+                    int sz;
+                    double* elem;
+
+                public:
+                    vector(int s):sz(s),elem(new double[s]){
+                        for(int i=0;i<s;i++)elem[i]=0;
+                    }
+
+                    ~vector(){
+                        delete[] elem;
+                    }
+
+                };
+
+    17.5.1                                      Generated Destructor
+
+                if a member of a class has destructor, then that destructor will be called when the object containing the member is 
+                destroyed.
+
+                e.g
+                        struct Customer{
+                            string name;
+                            vector<string> address;
+
+                        };
+
+                        void some_fun(){
+                            Customer fred;
+                            // initalise fred;
+                            //use fred
+                        }//fred is out of scope so it is destroyed i.e the destructor for name and address are called.
+
+                        The compiler generates a destructor for Customer ,which calls the member's destructors
+
+
+    
+
+
+
+    17.5.2                                          Destructors and free store
+
+
+
+
+
+                    if you have a class with a virtual function,it needs a virtual destructor.The reason is
+                        1. if a class has virtual function it is likely to be used as a base class and
+                        2. if it is a base class its derived class is likely to be allocated using new ,and
+                        3. if a derived class object is allocated using new and manipulated through
+                                a pointer to it's base then
+                        4. it is likely to be deleted through a pointer to it's base
+
+                        note that destructors are invoked implicitly or indirectly through delete.They
+                        are not called directly. That saves a lot of tricky work.
+
+
+
+17.7                                        pointer to class objects
+            
+                
+                    we can point to just about anything we can place in memory.
+
+                    e.g    vector* p = new vector(s);
+                            delete p;
+
+
+
+
+
+17.8                            Messing with types: void* and casts
+
+
+            void* means pointer to some memory that the compiler doesn't know the type of.
+            
+            Any pointer to any object type can be assigned to a void*.
+            
+            e.g   void* p = new int;
+                  void* p = new double[22];
+
+                        
+
+
+                                        casting 
+
+
+                void* p = new int;
+                int* p1 = static_cast<int*>(p);    //ok: explicit conversion
+
+
+
+                1. reinterpret_cast can cast between unrelated types,such as int and double*.
+                2. const_cast can "cast away cosnt"
+
+                e.g Register* in = reinterpret_cast<Register*>(0xff);
+
+                void f(const Buffer* p){
+                    Buffer* b = const_cast<Buffer*>(p);
+                    //..
+                }
+
+
+
+
+17.9                            pointer and references
+
+
+        you can think of a reference as an automatically dereferenced immutable pointer or
+        as an alternative name for an object.
+
+        1. Assignment to a pointer changes the pointer's value(not the pointed-to value)
+        2. To get a pointer you generally need to use new or &
+        3. To access an object pointed to by a pointer we use * or []
+        4. Assignment to a reference changes what the reference refers to(not the reference itself)
+        5. You can't make a reference refer to a different object after initialization
+        6. Assignment of refernce does a deep copy;assignment of pointers does not
+        7. beware of null pointers
+        
+        e.g
+
+            int y1 = 10;
+            int& p = y1;
+            int y2 = 20;
+            p = &y2;         // error you can not change the value of a reference;
+
+
+    A reference and a pointer are both implemented using memory address.
+
+
+
+
+
+
+
+
+
+17.9.1                          pointer and reference parameters
+
+         if you want to change the  value computed by a function
+         There are three choices-----------
+         1. int incr_v(int x){return x+1;}  // suitable for small object (pass by value)
+         2. void incr_p(int* p){++*p;} //may get null pointer problem(need protection)
+         3. incr_r(int& r){++r;} // can be best option
+
+
+
+
+
+
+17.10                               The this pointer
+
+
+
+
+        in every member function , the identifier this is a pointer that points to the object for which the member function
+        was called.
+
+
+
+
+
+        Link class example
+
+
+
+
+
+        class Link{
+        
+        public:
+            string value;
+            Link(const string& v,Link* p = 0,Link* s = 0):value(v),prev(p),succ(s){}
+            Link* insert(Link* n);
+            Link* add(Link* n);
+            Link* erase();
+            Link* find(const string& s);
+            const Link* find(const string& s)const;
+            Link* advance(int n)const;
+            Link* next() const{ return succ;}
+            Link* previous() const{ return prev;}
+
+        private:
+           Link* prev;
+           Link* succ;
+        };
+        
+
+                        THREE IMPLIMENTAION OF Link::insert(Link* )
+
+        Link* Link::insert(Link* n){ // insert n before p;return n
+            Link* p = this;
+            if(n == 0)return p;
+            if(p == 0)return n;
+            n->succ = p;
+            if(p->prev) p->prev->succ = n;
+            n->prev = p->prev;
+            p->prev = n;
+            return n;
+        }
+
+
+
+        Link* Link::insert(Link* n){
+            if(n==0)return this;
+            if(this == 0) return n;
+            n->succ = this;
+            if(this->prev) this->prev->succ = n;
+            n->prev = this->prev;
+            this->prev = n;
+            return n;
+        }
+
+
+                    // we don't need to mention "this" to access a member ,so we can remove this appropirately
+        Link* Link::insert(Link* n){
+            if(n == 0) return this;
+            if(this == 0) return n;
+            n->succ = this;
+            if(prev) prev->succ = n;
+            n->prev = prev;
+            prev = n;
+            return n;
+        }
+
+
+
+
+        NOTE:----------------------------------------------------
+
+        this has a specific meaning : it points to the object for which a member function is called. It does not point 
+        to any old object .The compiler ensures that we do not change the value of this in a member function.
+
+        e.g
+
+            struct S{
+                //....
+                    void mutate(S* p){
+                        this = p;           // error "this" is immutable
+                    }
+
+            };
+
+
+
+
+
+            
+
++
