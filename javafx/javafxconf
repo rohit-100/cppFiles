@@ -1,0 +1,1 @@
+-Djdk.gtk.version=2   --module-path /home/rohit/javafxSDK/lib --add-modules javafx.controls,javafx.fxml
