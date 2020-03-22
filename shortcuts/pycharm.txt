@@ -1,0 +1,3 @@
+ctrl+tab        move between files opened
+shift+esc       remove run window
+F10             to be in distraction free mode

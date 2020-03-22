@@ -67,21 +67,18 @@ node query(int s,int ss,int se,int l,int r){
 }
 int main(){
     int t;
-//     while(t--){
+    cin>>t;
+    while(t--){
         int n;cin>>n;
-        arr.assign(n+1,0);
-        tree.assign(4*n,0);
+        arr.assign(2*n+1,0);
+        tree.assign(8*n,0);
         for(int i=1;i<=n;i++){
             int x;cin>>x;
             arr[i] = x;
-//             arr[i+n] = x;
+            arr[i+n] = x;
         }
-        build(1,1,n);
-        int q;cin>>q;while(q--){
+        build(1,1,2*n);
+        for(int i=1;i<=n;i++)cout<<query(1,1,2*n,i,i+n-1).ans<<endl;
 
-        int l,r;cin>>l>>r; 
-        cout<<query(1,1,n,l,r).ans<<endl;
-        }
-//         for(int i=1;i<=n;i++)cout<<query(1,1,2*n,i,i+n-1).ans<<endl;
-        
+    }
 }

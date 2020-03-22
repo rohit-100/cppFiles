@@ -97,8 +97,9 @@ for _ in range(int(input())):
 
 
     for i in range(26):
-        if not done[i]:
-            mv = mothervertex(gg,i)
+        if not done[i] and len(gg[i])<2:
+#             mv = mothervertex(gg,i)
+            mv = i
             getpath(gg,mv,ans,mv,done)
 
            
