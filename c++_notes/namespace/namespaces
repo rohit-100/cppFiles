@@ -1,0 +1,53 @@
+namespace is simple scope
+
+namespace terminology can be thought as providing modularity in c++
+
+namespace::var_name   this is notation
+
+::var_name          // for global variable
+
+if we have two var , one local and other global
+to use them distinguishly we can use 
+'::' qulaifier for global and simple varibale name for local
+
+inside namespace we need not to put the qualifier to varible names
+they are understood to be inside that namespace
+
+we can only declear inside namespace ,and define outside namespace
+
+
+int f();   // global function
+int g()
+{
+    int f;  // local var iable; hides the global function  
+    f();    // error : we can’t call an int
+    ::f();  // OK: call the global function
+}
+
+
+                    using declarations
+
+    frequently used name are used for this
+
+    if i am using 'std::string' very much then writing 'std::' again and again will be tedious so we should write
+    'using std::string' and in place of 'std::string' we will just write 'string'
+
+    overloaded functions inside one namespce "if declared using" then all functions will be available
+
+
+                    using directive
+
+
+    using namespace std;    is an example for that
+
+
+    this may generate confilct if decleared global because if two namepaces have some varibales/function common then conflict will arise
+
+    so try to declear this 'using namespace ______' locally as much possible
+
+
+
+
+
+
+

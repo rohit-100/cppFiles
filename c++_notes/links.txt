@@ -1,3 +1,6 @@
 https://www.geeksforgeeks.org/difference-const-char-p-char-const-p-const-char-const-p/
 
 
+#########     this is a great webpage covering a lots of c++ questions  #################
+
+https://web.archive.org/web/20181115023158/http://www.comeaucomputing.com/techtalk/#nostatic  
