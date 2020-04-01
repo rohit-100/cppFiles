@@ -1,0 +1,21 @@
+9.1  
+    a class is a user defined type that specifies how objects are represented , how objects are created and how they are used and how they
+    are destroyed.
+
+
+
+9.3
+    public interface is what the user's view of class
+    private interface is what the implementer's view of class
+
+
+9.4
+    with writting member function inside class
+        1. The function will be inlined,(the compiler will generate code without using a fucntion call) , a performance boost
+        2. if something is changed inside class declaration body then all usues of the class will have to be recompiled.(loss of performance)
+
+
+    so rule of thumb:
+        Don't put member function bodies in the class declaration unless you know you need the performance boost from inlining
+        tiny function.
+

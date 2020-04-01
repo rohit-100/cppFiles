@@ -1,0 +1,35 @@
+1. inline functions 
+   
+   all member function defined inside the class definition are by default
+        inline. but we can make any non_class function inline by using keyword inline
+
+        inline functions are actual functions , which are copied everywhere during compilation,like preprocessor macro,
+            so overhead of function calling is reduced
+
+    
+    declaring a friend function is a way to give private access to non-member function
+
+2. copy constuctor
+    a copy constructor creates a new object,which is exact copy of the existing object.The compiler provides a default
+        copy constructor to all the classes
+    
+        class-name (class-name &){}
+        class-name (const class-name& )const {}
+
+3. modes of inheritance
+    public mode (all access modifier are as it is in child class)
+    protected mode(public members of base class is converted in protected mode)
+    private mode (all members are private of base class)
+
+
+
+4. virtual keyword in multiple inheritance
+    if two members are same in base classes and we want to inherit both the classes the we have to use virutal keyword
+        to prohibit confusion.
+
+5. polymorphism
+    compile time
+        1. methode ovverloading
+        2. operator overloading
+    runtime 
+        1. virtual functions
