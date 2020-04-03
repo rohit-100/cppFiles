@@ -1,0 +1,14 @@
+1.Load balancing
+    
+2. Session Persistence
+    done with cookies or ip details
+    this info allows the load balancer to use tracking id to route all 
+    of the user request to the specific server
+    
+    2.1 Session cookie
+        deleted at the end of session or when we close the browser
+    2.2 persistent cookie
+        remains persistent in the browser till we manually delete them
+3. consistent hashing
+
+4. 

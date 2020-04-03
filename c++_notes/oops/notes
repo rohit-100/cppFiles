@@ -21,6 +21,9 @@
     protected mode(public members of base class is converted in protected mode)
     private mode (all members are private of base class)
 
+    default mode  is private ( i.e if not mentioned in the mode  )
+    in struct ,defualt mode is public
+
 
 
 4. virtual keyword in multiple inheritance
@@ -33,3 +36,42 @@
         2. operator overloading
     runtime 
         1. virtual functions
+6. virtual function
+    virtual function are called according to the type of object instance pointed to or referenced, not according to the type fo the pointer
+        or reference.
+        
+    with the obove property an employee pointer can call all it's subclass's specific function implemented as virtual
+    
+    java keeps all it's methode virtual by default
+
+    
+    every object of every class which contain's a virtual function has a __vtpr pointer which points to a vTable which contains the
+        function pointer to virutual function
+
+    if any virual function is ovveridden by drived class then the vtable function pointer will point to the derived function else
+        it will point to the base class function pointer
+    
+    
+    A function in a derived class with the same signature as a virtual function in a base class overrides that virtual function from the base 
+    class. That makes it a virtual function, even if/though the declaration in the derived class doesn't use the virtual key word.
+
+    
+
+
+7. object of self type in class declaration
+
+    A class declaration can contain static object of self type, it can also have pointer to self type, 
+    but it cannot have a non-static object of self type.
+
+    static Test self;       // valid
+    Test* self             //valid
+    Test self              // invalid      can be considered as self recurrsion 
+        
+        in the last case , compiler can not calculate the size of the object
+        static varibale do not contibute to the size of object , so no problem
+        pointer has fixed size , so not problem
+
+
+8.  size of an empty class is one , not zero because to have differenct address while using objects with new keyword
+        drived class with empty class has also size one, due to complier optimization
+
