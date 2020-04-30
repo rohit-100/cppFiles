@@ -1,0 +1,43 @@
+
+undo things
+
+    
+    quickly save local changes(unstaged)
+
+        command             git stash
+
+        work    
+            used to save the current work and allow to move in different branch
+
+            if you have uncommited works then you can not switch to different branch.
+
+            what stash does, it saves all the newly added codes after the last commit and make 
+            it like as of after last commit , now you can move to different branch and do somechanges 
+            as normally we do with branches ,
+
+            after returning to previous branch we can run " git stash pop " to undo the changes 
+
+
+
+    staged  local changes(means we have ran the command "git add <files>")
+
+        command     git reset HEAD <file> 
+                        
+                           unstage the file to current commit
+                    git reset 
+                            
+                            unstage everything , retain changes
+
+                    git stash
+                            
+                            discard all local changes but save them for later
+
+                    git reset --hard
+
+                            discard everything permanently
+
+
+                        
+
+        
+
